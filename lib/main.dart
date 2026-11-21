@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 
-const supabaseUrl = 'https://pykmzpremfxhrygqcgqz.supabase.co';
+const supabaseUrl = 'https://pvkmzpremfxhrygqcgqz.supabase.co';
 const supabaseKey = 'sb_publishable_28Yec-iC2QtoYcj5vY0WpQ_MkcPH2h7';
 const bleu = Color(0xFF1E88E5);
 const bleuClair = Color(0xFF42A5F5);
