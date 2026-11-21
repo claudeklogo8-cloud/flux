@@ -11,6 +11,7 @@ jobs:
         with: { channel: stable }
       - run: flutter create . --platforms=android --project-name flux
       - run: sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' android/app/src/main/AndroidManifest.xml
+      - run: sed -i 's#android:label="[^"]*"#android:label="claude roi"#' android/app/src/main/AndroidManifest.xml
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
