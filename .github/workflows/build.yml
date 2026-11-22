@@ -23,6 +23,7 @@ jobs:
           }
           EOF
       - run: flutter pub get
+      - run: printf 'allprojects {\n afterEvaluate { p ->\n if (p.hasProperty("android")) { p.android.compileSdkVersion(36) }\n }\n}\n' >> ~/.gradle/init.gradle
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
         with:
