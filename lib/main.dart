@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
+import 'publish_page.dart';
 
 const supabaseUrl = 'https://pvkmzpremfxhrygqcgqz.supabase.co';
 const supabaseKey = 'sb_publishable_28Yec-iC2QtoYcj5vY0WpQ_MkcPH2h7';
@@ -251,6 +252,9 @@ class _ShellState extends State<Shell> {
   }
 
   Future<void> publier() async {
+        await Navigator.push(context, MaterialPageRoute(builder: (_) => const PublishPage()));
+    if (mounted) setState(() {});
+    return;
     if (envoi) return;
     final f = await ImagePicker().pickVideo(source: ImageSource.gallery);
     if (f == null || !mounted) return;
