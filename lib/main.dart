@@ -744,7 +744,22 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Map<String, dynamic>> _videos = [];
   int _following = 0, _followers = 0, _likes = 0;
   bool _loading = true;
-
+  Future<void> _changePhoto() async {
+    final f = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxWidth: 800, imageQuality: 85);
+    if (f == null) return;
+    try {
+      final chemin = '$uid/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      await db.storage.from('videos').upload(chemin, File(f.path),
+          fileOptions: const FileOptions(contentType: 'image/jpeg'));
+      final url = db.storage.from('videos').getPublicUrl(chemin);
+      await db.from('profiles').update({'avatar_url': url}).eq('id', uid);
+      await _load();
+      if (mounted) msg(context, 'Photo mise à jour');
+    } catch (e) {
+      if (mounted) msg(context, 'Erreur : $e');
+    }
+  }
   @override
   void initState() {
     super.initState();
