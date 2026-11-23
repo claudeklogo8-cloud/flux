@@ -826,7 +826,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _menu() { _menuComplet(); return;
+  void _menu() { 
                   void _menuComplet() {
     Widget item(IconData icon, String titre, VoidCallback onTap) => ListTile(
           leading: Icon(icon),
@@ -906,6 +906,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
                   }
+        _menuComplet(); return;
     showModalBottomSheet(
       context: context,
       builder: (c) => SafeArea(
