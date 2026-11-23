@@ -49,7 +49,7 @@ Future<String?> demanderTexte(BuildContext c) {
   );
 }
 
-void profil(BuildContext c) {
+void profil(BuildContext c) { Navigator.push(c, MaterialPageRoute(builder: (_) => const ProfilePage())); return;
   final mail = db.auth.currentUser?.email ?? '';
   showModalBottomSheet(
     context: c,
