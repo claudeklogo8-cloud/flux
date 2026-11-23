@@ -732,3 +732,217 @@ class _CommentsSheetState extends State<CommentsSheet> {
     );
   }
 }
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  Map<String, dynamic>? _profile;
+  List<Map<String, dynamic>> _videos = [];
+  int _following = 0, _followers = 0, _likes = 0;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<int> _count(String col) async {
+    try {
+      final r = await db.from('follows').select().eq(col, uid);
+      return (r as List).length;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Future<void> _load() async {
+    try {
+      _profile =
+          await db.from('profiles').select().eq('id', uid).maybeSingle();
+    } catch (_) {}
+    List<Map<String, dynamic>> vids = [];
+    int likes = 0;
+    try {
+      final r = await db
+          .from('videos_feed')
+          .select()
+          .eq('user_id', uid)
+          .order('created_at', ascending: false);
+      vids = List<Map<String, dynamic>>.from(r);
+      for (final v in vids) {
+        likes += int.tryParse('${v['likes_count']}') ?? 0;
+      }
+    } catch (_) {}
+    final following = await _count('follower_id');
+    final followers = await _count('following_id');
+    if (!mounted) return;
+    setState(() {
+      _videos = vids;
+      _likes = likes;
+      _following = following;
+      _followers = followers;
+      _loading = false;
+    });
+  }
+
+  Future<void> _edit() async {
+    final bio = TextEditingController(text: '${_profile?['bio'] ?? ''}');
+    final link = TextEditingController(text: '${_profile?['link'] ?? ''}');
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: const Text('Modifier le profil'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextField(
+              controller: bio,
+              maxLines: 3,
+              decoration: const InputDecoration(labelText: 'Biographie')),
+          TextField(
+              controller: link,
+              decoration: const InputDecoration(labelText: 'Lien')),
+        ]),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(c, false),
+              child: const Text('Annuler')),
+          TextButton(
+              onPressed: () => Navigator.pop(c, true),
+              child: const Text('Enregistrer')),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await db.from('profiles').update(
+          {'bio': bio.text.trim(), 'link': link.text.trim()}).eq('id', uid);
+      await _load();
+    } catch (e) {
+      if (mounted) msg(context, 'Erreur : $e');
+    }
+  }
+
+  void _menu() {
+    showModalBottomSheet(
+      context: context,
+      builder: (c) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ListTile(
+            leading: const Icon(Icons.edit),
+            title: const Text('Modifier le profil'),
+            onTap: () {
+              Navigator.pop(c);
+              _edit();
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Déconnexion'),
+            onTap: () async {
+              final nav = Navigator.of(context);
+              Navigator.pop(c);
+              await db.auth.signOut();
+              nav.popUntil((r) => r.isFirst);
+            },
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _stat(int n, String label) => Column(children: [
+        Text('$n',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ]);
+
+  @override
+  Widget build(BuildContext context) {
+    final name = '${_profile?['username'] ?? 'Mon profil'}';
+    final avatar = '${_profile?['avatar_url'] ?? ''}';
+    final bio = _profile?['bio'] == null ? '' : '${_profile!['bio']}';
+    final link = _profile?['link'] == null ? '' : '${_profile!['link']}';
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('@$name'),
+        actions: [IconButton(icon: const Icon(Icons.menu), onPressed: _menu)],
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _load,
+              child: ListView(children: [
+                const SizedBox(height: 16),
+                Center(
+                  child: CircleAvatar(
+                    radius: 48,
+                    backgroundColor: bleu,
+                    backgroundImage:
+                        avatar.isNotEmpty ? NetworkImage(avatar) : null,
+                    child: avatar.isEmpty
+                        ? Text(name.isNotEmpty ? name[0].toUpperCase() : '?',
+                            style: const TextStyle(
+                                fontSize: 36, color: Colors.white))
+                        : null,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _stat(_following, 'Abonnements'),
+                      _stat(_followers, 'Abonnés'),
+                      _stat(_likes, 'Likes reçus'),
+                    ]),
+                if (bio.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Text(bio, textAlign: TextAlign.center),
+                  ),
+                if (link.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(link,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: bleuClair)),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: OutlinedButton(
+                      onPressed: _edit,
+                      child: const Text('Modifier le profil')),
+                ),
+                const Divider(height: 1),
+                if (_videos.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Center(child: Text('Aucune vidéo publiée')),
+                  )
+                else
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(2),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 2,
+                            crossAxisSpacing: 2,
+                            childAspectRatio: 0.7),
+                    itemCount: _videos.length,
+                    itemBuilder: (c, i) => Container(
+                      color: const Color(0xFF0D2A4A),
+                      child: const Center(
+                          child: Icon(Icons.play_arrow,
+                              color: Colors.white70, size: 36)),
+                    ),
+                  ),
+              ]),
+            ),
+    );
+  }
+}
