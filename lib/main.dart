@@ -989,7 +989,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontSize: 36, color: Colors.white))
                         : null,
                   ),
-                          Positioned(                                  Positioned(
+                                                            Positioned(
                     right: 0,
                     bottom: 0,
                     child: GestureDetector(
