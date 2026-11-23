@@ -826,7 +826,86 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _menu() {
+  void _menu() { _menuComplet(); return;
+                  void _menuComplet() {
+    Widget item(IconData icon, String titre, VoidCallback onTap) => ListTile(
+          leading: Icon(icon),
+          title: Text(titre),
+          trailing: const Icon(Icons.chevron_right, size: 20),
+          onTap: onTap,
+        );
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (c) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8),
+          child: ListView(shrinkWrap: true, children: [
+            item(Icons.edit_outlined, 'Modifier le profil', () {
+              Navigator.pop(c);
+              _edit();
+            }),
+            item(Icons.bookmark_border, 'Mes favoris', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.favorite_border, 'Mes likes', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.history, 'Historique de visionnage', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.download_outlined, 'Vidéos hors ligne', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.share_outlined, 'Partager le profil', () async {
+              Navigator.pop(c);
+              await Clipboard.setData(
+                  ClipboardData(text: '@${_profile?['username'] ?? ''}'));
+              if (mounted) msg(context, 'Pseudo copié');
+            }),
+            const Divider(height: 1),
+            item(Icons.notifications_none, 'Notifications', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.lock_outline, 'Confidentialité et sécurité', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.language, 'Langue', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.help_outline, 'Aide et assistance', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            item(Icons.info_outline, 'À propos de flux', () {
+              Navigator.pop(c);
+              bientot(context);
+            }),
+            const Divider(height: 1),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              title: const Text('Déconnexion',
+                  style: TextStyle(color: Colors.redAccent)),
+              onTap: () async {
+                final nav = Navigator.of(context);
+                Navigator.pop(c);
+                await db.auth.signOut();
+                nav.popUntil((r) => r.isFirst);
+              },
+            ),
+          ]),
+        ),
+      ),
+    );
+                  }
     showModalBottomSheet(
       context: context,
       builder: (c) => SafeArea(
