@@ -978,7 +978,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: ListView(children: [
                 const SizedBox(height: 16),
                 Center(
-                  child: CircleAvatar(
+                  child: Stack(children: [CircleAvatar(
                     radius: 48,
                     backgroundColor: bleu,
                     backgroundImage:
@@ -989,6 +989,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontSize: 36, color: Colors.white))
                         : null,
                   ),
+                          Positioned(                                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: GestureDetector(
+                      onTap: _changePhoto,
+                      child: const CircleAvatar(
+                        radius: 16,
+                        backgroundColor: bleuClair,
+                        child:
+                            Icon(Icons.edit, size: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ]),
                 ),
                 const SizedBox(height: 12),
                 Row(
