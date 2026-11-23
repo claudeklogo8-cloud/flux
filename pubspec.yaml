@@ -7,11 +7,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  video_player: ^2.8.0
   supabase_flutter: ^2.8.0
   image_picker: ^1.1.2
   file_picker: ^8.1.2
   audioplayers: ^6.1.0
-  video_thumbnail: ^0.5.3
 flutter:
   uses-material-design: true
