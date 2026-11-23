@@ -826,7 +826,23 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _menu() { 
+  void _menu() {
+      Future<void> _changePhoto() async {
+    final f = await ImagePicker().pickImage(
+        source: ImageSource.gallery, maxWidth: 800, imageQuality: 85);
+    if (f == null) return;
+    try {
+      final chemin = '$uid/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      await db.storage.from('videos').upload(chemin, File(f.path),
+          fileOptions: const FileOptions(contentType: 'image/jpeg'));
+      final url = db.storage.from('videos').getPublicUrl(chemin);
+      await db.from('profiles').update({'avatar_url': url}).eq('id', uid);
+      await _load();
+      if (mounted) msg(context, 'Photo mise à jour');
+    } catch (e) {
+      if (mounted) msg(context, 'Erreur : $e');
+    }
+      } 
                   void _menuComplet() {
     Widget item(IconData icon, String titre, VoidCallback onTap) => ListTile(
           leading: Icon(icon),
@@ -845,6 +861,10 @@ class _ProfilePageState extends State<ProfilePage> {
             item(Icons.edit_outlined, 'Modifier le profil', () {
               Navigator.pop(c);
               _edit();
+            }),
+                        item(Icons.photo_camera_outlined, 'Changer la photo de profil', () {
+              Navigator.pop(c);
+              _changePhoto();
             }),
             item(Icons.bookmark_border, 'Mes favoris', () {
               Navigator.pop(c);
