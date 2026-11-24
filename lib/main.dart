@@ -732,7 +732,32 @@ class _CommentsSheetState extends State<CommentsSheet> {
     );
   }
 }
-
+class VideoViewer extends StatelessWidget {
+  final List<Map<String, dynamic>> videos;
+  final int index;
+  const VideoViewer({super.key, required this.videos, required this.index});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(children: [
+        PageView.builder(
+          scrollDirection: Axis.vertical,
+          controller: PageController(initialPage: index),
+          itemCount: videos.length,
+          itemBuilder: (_, i) =>
+              VideoPage(key: ValueKey(videos[i]['id']), v: videos[i]),
+        ),
+        SafeArea(
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+      ]),
+    );
+  }
+}
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
   @override
@@ -1063,12 +1088,29 @@ class _ProfilePageState extends State<ProfilePage> {
                             crossAxisSpacing: 2,
                             childAspectRatio: 0.7),
                     itemCount: _videos.length,
-                    itemBuilder: (c, i) => Container(
-                      color: const Color(0xFF0D2A4A),
-                      child: const Center(
-                          child: Icon(Icons.play_arrow,
-                              color: Colors.white70, size: 36)),
-                    ),
+                                        itemBuilder: (c, i) {
+                      final cover = '${_videos[i]['cover_url'] ?? ''}';
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                            c,
+                            MaterialPageRoute(
+                                builder: (_) =>
+                                    VideoViewer(videos: _videos, index: i))),
+                        child: Container(
+                          color: const Color(0xFF0D2A4A),
+                          child: Stack(fit: StackFit.expand, children: [
+                            if (cover.isNotEmpty && cover != 'null')
+                              Image.network(cover,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (c, e, s) =>
+                                      const SizedBox()),
+                            const Center(
+                                child: Icon(Icons.play_arrow,
+                                    color: Colors.white70, size: 36)),
+                          ]),
+                        ),
+                      );
+                    },
                   ),
               ]),
             ),
