@@ -365,7 +365,10 @@ class _ShellState extends State<Shell> {
                                 color: Colors.white)),
                       ),
                     ),
-                                            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MessagesPage()))),
+
+                                        navItem(Icons.mail_outline, 'Message', false,
+                        () => Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => const MessagesPage()))),
                     navItem(Icons.home, 'Accueil', true, charger),
                   ]),
             ),
