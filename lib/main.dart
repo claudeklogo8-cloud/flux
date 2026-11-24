@@ -413,7 +413,16 @@ class _VideoPageState extends State<VideoPage> {
       });
     etat();
   }
-
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!ctrl.value.isInitialized) return;
+    if (TickerMode.of(context)) {
+      ctrl.play();
+    } else {
+      ctrl.pause();
+    }
+  }
   @override
   void dispose() {
     ctrl.dispose();
