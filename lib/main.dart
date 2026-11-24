@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'publish_page.dart';
+import 'video_viewer.dart';
 
 const supabaseUrl = 'https://pvkmzpremfxhrygqcgqz.supabase.co';
 const supabaseKey = 'sb_publishable_28Yec-iC2QtoYcj5vY0WpQ_MkcPH2h7';
