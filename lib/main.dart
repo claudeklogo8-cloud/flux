@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:video_player/video_player.dart';
 import 'publish_page.dart';
 import 'video_viewer.dart';
+import 'messages_page.dart';
 
 const supabaseUrl = 'https://pvkmzpremfxhrygqcgqz.supabase.co';
 const supabaseKey = 'sb_publishable_28Yec-iC2QtoYcj5vY0WpQ_MkcPH2h7';
@@ -364,8 +365,7 @@ class _ShellState extends State<Shell> {
                                 color: Colors.white)),
                       ),
                     ),
-                    navItem(Icons.mail_outline, 'Message', false,
-                        () => bientot(context)),
+                                            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MessagesPage()))),
                     navItem(Icons.home, 'Accueil', true, charger),
                   ]),
             ),
